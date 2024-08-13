@@ -17,6 +17,11 @@ methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 
 print("Methods:")
 for method in methods:
+    """
+    condition to iterate over the methods listed above
+    to get the number of documents in the collection
+    that have these methods
+    """
     count = collection.count_documents({"method": method})
     print(f"\tmethod {method}: {count}")
 

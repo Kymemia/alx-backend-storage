@@ -8,8 +8,17 @@ method, store, that takes a data arg and returns a string
 """
 import redis
 import uuid
-from typing import Union
+from typing import Union, Callable, Optional
+import functools
 
+
+def count_calls(method: Callable) -> Callable:
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        key = f"{method.__qualname__}_calls"
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+    return wrapper
 
 class Cache:
     def __init__(self):
@@ -20,6 +29,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         method definition to store input data

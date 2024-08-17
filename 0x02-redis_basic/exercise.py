@@ -28,3 +28,31 @@ class Cache:
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
+
+    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float, None]:
+        """
+        method definition that takes a key string argument
+        and an optional Callable argument, fn
+        the callable will be used to convert
+        the data back to the desired format
+        """
+        data = self._redis.get(key)
+        if data is None:
+            return None
+        if fn:
+            return fn(data)
+        return data
+
+    def get_int(self, key: str) -> Optional[int]:
+        """
+        method definition to parametrize Cache.get
+        with the correct conversion function
+        """
+        return self.get(key, fn=int)
+
+    def get_str(self, key: str) -> Optional[str]:
+        """
+        method definition to parametrize Cache.get
+        with the correct conversion function
+        """
+        return self.get(key, fn=lambda x: x.decode('utf-8'))
